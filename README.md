@@ -73,7 +73,6 @@ The current metadata-policy work uses deterministic evaluators over request meta
 - `POST /api/artifacts/export` - bind an allowed receipt to a synthetic artifact and return the artifact plus signed receipt sidecar.
 - `POST /api/artifacts/verify` - verify the artifact hash, manifest hash, and server signature.
 
-The [verified release walkthrough](docs/VERIFIED_RELEASE_WALKTHROUGH.md) explains the deterministic replay suite, PostgreSQL integration check, signed evidence output, and its limits.
 
 ## Limits
 
