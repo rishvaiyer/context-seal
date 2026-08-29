@@ -14,8 +14,9 @@ import crypto from 'node:crypto';
 // receipt offline with the public key alone. See scripts/verify-receipt.mjs for
 // a dependency-free third-party verifier.
 //
-// HMAC verification is retained ONLY so receipts issued before this change still
-// verify. Nothing signs with HMAC anymore.
+// HMAC signing and verification remain available while Ed25519 is disabled.
+// This keeps the default behavior compatible with receipts created before the
+// asymmetric signing path was added.
 
 // ---------------------------------------------------------------------------
 // TOGGLE: Ed25519 signing is OFF by default.

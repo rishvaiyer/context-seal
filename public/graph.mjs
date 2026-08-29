@@ -4,14 +4,14 @@ export const NODE_DETAILS = Object.freeze({
   proxy: { type: 'proxy', typeLabel: 'BOUNDARY', title: 'CanaryNorth policy proxy', what: 'This is the checkpoint. It checks identity, expiry, action, resource, and content before anything could be forwarded.', security: 'Default deny: a request needs every check to pass. Failed input is quarantined here.' },
   weather: { type: 'tool', typeLabel: 'TOOL', title: 'weather.get_forecast', what: 'A synthetic weather tool that could receive an approved forecast request. It never sees a blocked request.', security: 'Allowlisted only for weather://nyc through the forecast capability.' },
   tickets: { type: 'tool', typeLabel: 'TOOL', title: 'tickets.update', what: 'A separate synthetic tool with a different capability. It demonstrates that one permission does not unlock every tool.', security: 'Scoped to one demo ticket and write:ticket; the weather capability cannot reach it.' },
-  vault: { type: 'vault', typeLabel: 'SECRET STORE', title: 'Secret vault', what: 'Provider credentials live here on the server. The proxy can look them up after policy passes, but the agent never receives them.', security: 'Never serialized into model context, receipts, or the public demo payload.' },
+  vault: { type: 'vault', typeLabel: 'CREDENTIAL BOUNDARY', title: 'Server-side credential boundary', what: 'A production adapter can resolve a provider credential after policy passes. The demo uses no provider credential.', security: 'Credential material stays outside model context and decision receipts.' },
   ledger: { type: 'ledger', typeLabel: 'EVIDENCE', title: 'Signed receipt ledger', what: 'Each decision leaves a small receipt with a hash and a link to the previous receipt.', security: 'A tamper-evident chain makes silent edits detectable. This demo ledger is in memory and resets on restart.' }
 });
 export const EDGE_DETAILS = Object.freeze({
   'agent->proxy': { title: 'Capability handoff', explanation: 'The agent presents an opaque capability reference. No provider credential crosses this boundary.' },
   'proxy->weather': { title: 'Would-forward path', explanation: 'Only an approved forecast request could be forwarded to the synthetic weather tool.' },
   'proxy->tickets': { title: 'Separate scope', explanation: 'A weather capability does not grant access to the separate ticket update tool.' },
-  'vault->proxy': { title: 'Server-side lookup', explanation: 'A credential may be looked up after policy passes, but it is never returned to the agent.' },
+  'vault->proxy': { title: 'Server-side resolution', explanation: 'A production adapter can resolve credential material after policy passes without returning it to the agent.' },
   'proxy->ledger': { title: 'Receipt chain', explanation: 'The policy decision is recorded with a hash and a link to the previous receipt.' }
 });
 export const SCENARIOS = Object.freeze({
@@ -28,7 +28,7 @@ export const SCENARIOS = Object.freeze({
   injection: Object.freeze({
     label: 'Prompt injection',
     tone: 'deny',
-    summary: 'The content firewall quarantines the request at the policy boundary.',
+    summary: 'Bounded input screening holds the request at the policy boundary.',
     steps: Object.freeze([
       Object.freeze({ label: 'Request arrives', detail: 'The agent presents a capability and untrusted input to the boundary.', path: ['agent', 'proxy'] }),
       Object.freeze({ label: 'Input quarantined', detail: 'Prompt-injection content stops at CanaryNorth. No tool receives it.', path: ['proxy'] }),

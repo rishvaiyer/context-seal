@@ -37,25 +37,6 @@ function toast(message) {
   toast.timer = setTimeout(() => el.classList.remove('show'), 2800);
 }
 
-function setupTheme() {
-  const root = document.documentElement;
-  const toggle = $('#theme-toggle');
-  if (!toggle) return;
-  const update = () => {
-    const dark = root.dataset.theme === 'dark';
-    toggle.setAttribute('aria-pressed', String(dark));
-    toggle.querySelector('.theme-label').textContent = dark ? 'Light mode' : 'Dark mode';
-    toggle.querySelector('.theme-icon').textContent = dark ? '☼' : '◐';
-  };
-  update();
-  toggle.addEventListener('click', () => {
-    const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-    root.dataset.theme = next;
-    localStorage.setItem('canarynorth-theme', next);
-    update();
-  });
-}
-
 function buildApprovalRequest() {
   return {
     capabilityId: 'cap_ticket_update_91ae',
@@ -85,7 +66,7 @@ const SYNTHETIC_EVIDENCE_EVENTS = [
     referenceTarget: 'syn-evt-001',
     referenceType: 'receipt',
     retention: '2026-09-14',
-    detail: 'Synthetic example only. The prompt text is intentionally withheld so the human view does not repeat an unsafe instruction.'
+    detail: 'The prompt text is withheld so the human view does not repeat the flagged instruction.'
   },
   {
     id: 'syn-evt-002',
@@ -99,7 +80,7 @@ const SYNTHETIC_EVIDENCE_EVENTS = [
     referenceTarget: 'syn-evt-002',
     referenceType: 'receipt',
     retention: '2026-09-14',
-    detail: 'Synthetic example only. The ledger keeps the policy reason and hash, not the example value that triggered the rule.'
+    detail: 'The ledger keeps the policy reason and hash instead of the matched value.'
   },
   {
     id: 'syn-evt-003',
@@ -113,7 +94,7 @@ const SYNTHETIC_EVIDENCE_EVENTS = [
     referenceTarget: 'syn-evt-003',
     referenceType: 'receipt',
     retention: '2026-09-14',
-    detail: 'Synthetic example only. Replay protection is represented as a recorded decision; this row does not expose a request payload.'
+    detail: 'The receipt records the replay decision without retaining the request payload.'
   },
   {
     id: 'syn-evt-004',
@@ -127,35 +108,7 @@ const SYNTHETIC_EVIDENCE_EVENTS = [
     referenceTarget: 'approval-title',
     referenceType: 'approval',
     retention: '2026-09-14',
-    detail: 'Synthetic example only. Use the approval controls above to create a short-lived demo approval record. No ticket system is called.'
-  },
-  {
-    id: 'syn-evt-005',
-    category: 'steganography-signal',
-    severity: 'low',
-    status: 'example only',
-    reason: 'A synthetic signal is shown to demonstrate a review queue entry.',
-    redaction: 'Metadata only',
-    hash: 'sha256:syn-5b77aa',
-    reference: 'Receipt syn-evt-005',
-    referenceTarget: 'syn-evt-005',
-    referenceType: 'receipt',
-    retention: '2026-09-14',
-    detail: 'No steganography detector is live here. This row is a labeled synthetic example of how a future signal could appear to a human reviewer.'
-  },
-  {
-    id: 'syn-evt-006',
-    category: 'malware-scan',
-    severity: 'low',
-    status: 'not run',
-    reason: 'The ledger shape is present, but no malware scan is connected.',
-    redaction: 'Metadata only',
-    hash: 'sha256:syn-malware',
-    reference: 'Receipt syn-evt-006',
-    referenceTarget: 'syn-evt-006',
-    referenceType: 'receipt',
-    retention: '2026-09-14',
-    detail: 'No malware scanner ran. This synthetic row exists to make the non-claim visible instead of implying a security result.'
+    detail: 'Use the approval controls above to create a short-lived demo approval record.'
   }
 ];
 
@@ -182,9 +135,9 @@ function normalizeApproval(item) {
 function approvalStatusCopy(status) {
   return {
     pending: ['Pending human decision', 'Choose approve or deny. Either choice only updates this synthetic approval record.'],
-    approved: ['Approved in the synthetic ledger', 'The approval was recorded. No ticket system or external tool ran.'],
-    denied: ['Denied in the synthetic ledger', 'The denial was recorded. No ticket system or external tool ran.'],
-    expired: ['Expired without a decision', 'This approval window ended. No ticket system or external tool ran.']
+    approved: ['Approved in the synthetic ledger', 'The approval decision was recorded.'],
+    denied: ['Denied in the synthetic ledger', 'The denial decision was recorded.'],
+    expired: ['Expired without a decision', 'This approval window ended.']
   }[status] || ['Approval status unavailable', 'The API did not return a recognized approval state.'];
 }
 
@@ -209,7 +162,7 @@ function renderApproval() {
   statusEl.className = `approval-status ${current?.status || 'idle'}`;
   statusEl.setAttribute('aria-busy', String(state.approvalBusy || state.approvalLoading));
   if (state.approvalBusy || state.approvalLoading) {
-    statusEl.innerHTML = '<div class="approval-status-main"><span class="approval-status-dot" aria-hidden="true"></span><div><strong>Saving approval state...</strong><p>Waiting for the synthetic approval API. No tool is running.</p></div></div>';
+    statusEl.innerHTML = '<div class="approval-status-main"><span class="approval-status-dot" aria-hidden="true"></span><div><strong>Saving approval state...</strong><p>Waiting for the synthetic approval API.</p></div></div>';
   } else if (!current) {
     statusEl.innerHTML = '<div class="approval-status-main"><span class="approval-status-dot" aria-hidden="true"></span><div><strong>No approval requested</strong><p>Request a synthetic update to begin.</p></div></div>';
   } else {
@@ -496,7 +449,7 @@ function playScenario(kind = state.scenario) {
 function updateBanner(result, kind) {
   const allowed = result.receipt?.decision === 'allow';
   const title = allowed ? 'Allowed, would forward to synthetic tool' : `Blocked, ${result.receipt?.reasonCode || result.code}`;
-  const copy = allowed ? 'The boundary passed the checks and minted a signed receipt. No external tool ran.' : 'The request stopped before a tool could receive it. The receipt records why.';
+  const copy = allowed ? 'The boundary passed the checks and minted a signed receipt.' : 'The request stopped before a tool could receive it. The receipt records why.';
   state.caseStatus = allowed ? 'allowed' : 'blocked';
   $('#decision-banner').className = `decision-banner ${allowed ? 'allow' : 'deny'}`;
   $('#decision-banner').innerHTML = `<span class="decision-icon">${allowed ? '✓' : '×'}</span><div><b>${title}</b><small>${copy}</small></div>`;
@@ -620,7 +573,6 @@ function bindGraph() {
 
 async function init() {
   try {
-    setupTheme();
     state.data = await api('/api/bootstrap');
     renderCapabilities(state.data.capabilities);
     renderReceipts(state.data.receipts);

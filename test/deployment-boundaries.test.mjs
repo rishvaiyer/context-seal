@@ -176,6 +176,13 @@ test('explicit demo mode stays labeled synthetic and exposes ephemeral signing p
     assert.equal(publicKey.status, 200);
     assert.equal(publicKey.payload.ephemeralKey, true);
     assert.match(publicKey.payload.note, /regenerated on restart/);
+
+    const removedConsole = await jsonRequest(runtime.origin, '/pen-console/index.html');
+    const removedEntrance = await jsonRequest(runtime.origin, '/pen-entry.html');
+    assert.equal(removedConsole.status, 404);
+    assert.equal(removedConsole.payload.error, 'not-found');
+    assert.equal(removedEntrance.status, 404);
+    assert.equal(removedEntrance.payload.error, 'not-found');
   } finally {
     await stopServer(runtime.child);
   }

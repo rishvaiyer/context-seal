@@ -13,10 +13,7 @@ import { config } from './config.mjs';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(root, 'public');
-const { port, isProduction, host, demoMode, requireAuth, signingSecret, authToken, penGatePassword } = config;
-const penGateSessions = new Map();
-const PEN_GATE_COOKIE = 'pentel_session';
-const PEN_GATE_SESSION_TTL_MS = 12 * 60 * 60 * 1000;
+const { port, isProduction, host, demoMode, requireAuth, signingSecret, authToken } = config;
 // Ed25519 signer. Receipts are signed with the private key; the public key is
 // served at /api/signing-key so anyone can verify a receipt without it.
 // An ephemeral key is allowed only outside production, and /health reports it,
@@ -44,9 +41,7 @@ const SYNTHETIC_EVIDENCE_EVENTS = Object.freeze([
   { id: 'syn-evt-001', type: 'prompt-injection', severity: 'high', summary: 'Instruction-conflict example stopped at the policy boundary.', details: { payload: '[REDACTED]' }, metadata: { status: 'blocked', source: 'synthetic-demo' } },
   { id: 'syn-evt-002', type: 'dlp', severity: 'high', summary: 'Secret-like pattern example stopped before tool forwarding.', details: { matchedValue: '[REDACTED]' }, metadata: { status: 'blocked', source: 'synthetic-demo' } },
   { id: 'syn-evt-003', type: 'replay', severity: 'medium', summary: 'A synthetic nonce was presented a second time.', details: {}, metadata: { status: 'blocked', source: 'synthetic-demo' } },
-  { id: 'syn-evt-004', type: 'approval', severity: 'medium', summary: 'A human decision is required before a synthetic ticket update.', details: {}, metadata: { status: 'pending-review', source: 'synthetic-demo' } },
-  { id: 'syn-evt-005', type: 'steganography-signal', severity: 'low', summary: 'A synthetic signal is shown as a future review-queue entry.', details: {}, metadata: { status: 'example-only', detector: 'not-connected', source: 'synthetic-demo' } },
-  { id: 'syn-evt-006', type: 'malware-scan', severity: 'low', summary: 'The ledger shape is present, but no malware scan is connected.', details: {}, metadata: { status: 'not-run', detector: 'not-connected', source: 'synthetic-demo' } }
+  { id: 'syn-evt-004', type: 'approval', severity: 'medium', summary: 'A human decision is required before a synthetic ticket update.', details: {}, metadata: { status: 'pending-review', source: 'synthetic-demo' } }
 ]);
 const syntheticEvidence = SYNTHETIC_EVIDENCE_EVENTS.map((event) => createEvidenceEvent(event));
 
@@ -56,7 +51,7 @@ function graph() {
   return { nodes: [
     { id: 'agent', label: 'Agent context', type: 'agent', note: 'opaque refs only' }, { id: 'proxy', label: 'CanaryNorth', type: 'proxy', note: 'policy + DLP + expiry' },
     { id: 'weather', label: 'weather.get_forecast', type: 'tool', note: 'allowlisted' }, { id: 'tickets', label: 'tickets.update', type: 'tool', note: 'scoped resource' },
-    { id: 'vault', label: 'Secret vault', type: 'vault', note: 'never enters context' }, { id: 'ledger', label: 'Receipt ledger', type: 'ledger', note: 'hash chained' }
+    { id: 'vault', label: 'Credential boundary', type: 'vault', note: 'server-side only' }, { id: 'ledger', label: 'Receipt ledger', type: 'ledger', note: 'hash chained' }
   ], edges: [
     { from: 'agent', to: 'proxy', label: 'cap_*' }, { from: 'proxy', to: 'weather', label: 'permit' }, { from: 'proxy', to: 'tickets', label: 'permit' },
     { from: 'vault', to: 'proxy', label: 'server-side lookup' }, { from: 'proxy', to: 'ledger', label: 'signed receipt' }
@@ -87,44 +82,6 @@ function authorized(req) {
   const provided = header.startsWith('Bearer ') ? Buffer.from(header.slice(7)) : Buffer.alloc(0);
   const expected = Buffer.from(authToken);
   return provided.length === expected.length && crypto.timingSafeEqual(provided, expected);
-}
-function cookieValue(req, name) {
-  const cookies = req.headers.cookie || '';
-  for (const part of cookies.split(';')) {
-    const [key, ...value] = part.trim().split('=');
-    if (key === name) return decodeURIComponent(value.join('='));
-  }
-  return null;
-}
-function penGateSessionValid(req) {
-  if (!penGatePassword) return false;
-  const token = cookieValue(req, PEN_GATE_COOKIE);
-  if (!token) return false;
-  const createdAt = penGateSessions.get(token);
-  if (!createdAt || Date.now() - createdAt > PEN_GATE_SESSION_TTL_MS) {
-    penGateSessions.delete(token);
-    return false;
-  }
-  return true;
-}
-function constantTimeMatch(provided, expected) {
-  const providedBytes = Buffer.from(provided);
-  const expectedBytes = Buffer.from(expected);
-  return providedBytes.length === expectedBytes.length && crypto.timingSafeEqual(providedBytes, expectedBytes);
-}
-function issuePenGateSession() {
-  const token = crypto.randomBytes(32).toString('base64url');
-  penGateSessions.set(token, Date.now());
-  return token;
-}
-function secureCookie(req) { return isProduction || req.headers['x-forwarded-proto'] === 'https'; }
-function isPenConsolePath(pathname) { return pathname === '/pen-console' || pathname.startsWith('/pen-console/'); }
-function isPenGatePage(pathname) { return pathname === '/pen-console/gate.html'; }
-function isHtmlRequest(req, pathname) { return pathname.endsWith('.html') || (req.headers.accept || '').includes('text/html'); }
-function redirectToPenGate(res, pathname) {
-  const returnTo = encodeURIComponent(pathname);
-  res.writeHead(302, { ...securityHeaders(), location: `/pen-console/gate.html?returnTo=${returnTo}`, 'cache-control': 'no-store' });
-  res.end();
 }
 function scopeForRequest(req) {
   const tenantId = req.headers['x-contextseal-tenant'];
@@ -402,27 +359,7 @@ const server = http.createServer(async (req, res) => {
       const evidencePackage = createEvidencePackage({ events: selected, wrappingKey: evidenceWrappingKey, keyId: config.evidenceKeyId, retentionDeadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() });
       return json(res, 200, { syntheticOnly: true, decryptLocally: true, package: evidencePackage });
     }
-    if (req.method === 'POST' && url.pathname === '/auth/pen-console') {
-      if (!penGatePassword) return json(res, 503, { error: 'authentication-unconfigured' });
-      const request = await body(req);
-      if (!request || typeof request.password !== 'string' || !constantTimeMatch(request.password, penGatePassword)) {
-        return json(res, 401, { error: 'authentication-failed' });
-      }
-      const token = issuePenGateSession();
-      res.writeHead(204, {
-        ...securityHeaders(),
-        'cache-control': 'no-store',
-        'set-cookie': `${PEN_GATE_COOKIE}=${encodeURIComponent(token)}; Path=/pen-console; HttpOnly; SameSite=Lax${secureCookie(req) ? '; Secure' : ''}`
-      });
-      res.end();
-      return;
-    }
     if (req.method === 'POST' && url.pathname === '/mcp/audit') { const request = validateAuditRequest(await body(req)); return json(res, 200, { jsonrpc: '2.0', result: { service: 'context-seal', capabilities: DEMO_CAPABILITIES.length, receipts: (await receiptStore.list(scopeForRequest(req))).map(({ receipt }) => receipt), policy: 'deny-by-default', policyVersion: POLICY_VERSION }, id: request.id ?? 1 }); }
-    const isPenGateAsset = url.pathname === '/pen-console/gate.css';
-    if (isPenConsolePath(url.pathname) && penGatePassword && !isPenGatePage(url.pathname) && !isPenGateAsset && !penGateSessionValid(req)) {
-      if (isHtmlRequest(req, url.pathname)) return redirectToPenGate(res, url.pathname);
-      return json(res, 401, { error: 'authentication-required' });
-    }
     if (req.method === 'GET') return staticFile(res, url.pathname);
     return json(res, 405, { error: 'method-not-allowed' });
   } catch (error) { const status = error.message === 'payload-too-large' || error.message === 'input-too-large' ? 413 : error.code === 'receipt-storage-unavailable' || error.message === 'receipt-ledger-integrity-failure' ? 503 : 400; return json(res, status, { error: status === 503 ? 'service-unavailable' : 'invalid-request', ...(isProduction ? {} : { detail: error.message }) }); }

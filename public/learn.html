@@ -6,30 +6,19 @@
   <meta name="theme-color" content="#f3f1eb">
   <meta name="description" content="A plain-language guide to the CanaryNorth synthetic AI action checkpoint.">
   <title>CanaryNorth | How it works</title>
-  <script>
-    (() => {
-      const saved = localStorage.getItem('canarynorth-theme');
-      document.documentElement.dataset.theme = saved === 'light' || saved === 'dark' ? saved : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    })();
-  </script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="/theme.js"></script>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <main class="site-shell guide-shell">
     <header class="site-header"><a class="brand" href="/" aria-label="CanaryNorth home"><span class="brand-mark" aria-hidden="true">/</span><span>CanaryNorth</span></a><nav class="site-nav" aria-label="Site navigation"><a href="/">Back to demo</a><button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false"><span class="theme-icon" aria-hidden="true">◐</span><span class="theme-label">Dark mode</span></button></nav></header>
-    <section class="guide-hero"><div><p class="eyebrow">How it works</p><h1>A request reaches a checkpoint before it reaches a tool.</h1><p class="intro-lede">CanaryNorth gives an AI a narrow way to ask for an action, gives a person a clear decision point, and keeps a record of what happened.</p></div><div class="guide-callout"><span class="eyebrow">The short version</span><strong>Ask. Check. Decide. Remember.</strong><p>The demo is synthetic. The boundary never calls an external tool.</p></div></section>
+    <section class="guide-hero"><div><p class="eyebrow">How it works</p><h1>A request reaches a checkpoint before it reaches a tool.</h1><p class="intro-lede">CanaryNorth gives an AI a narrow way to ask for an action, gives a person a clear decision point, and keeps a record of what happened.</p></div><div class="guide-callout"><span class="eyebrow">The short version</span><strong>Ask. Check. Decide. Remember.</strong><p>The boundary turns a proposed action into a decision and a readable receipt.</p></div></section>
     <section class="guide-flow" aria-labelledby="flow-title"><div class="section-heading"><div><p class="eyebrow">The flow</p><h2 id="flow-title">Four things happen</h2></div><span class="section-note">plain language first</span></div><div class="guide-cards"><article><span class="guide-number">01</span><h3>Ask with a reference</h3><p>The model sees a capability reference such as <code>cap_weather_read_7f3d</code>. It does not receive the provider credential.</p></article><article><span class="guide-number">02</span><h3>Check the request</h3><p>The boundary checks the action, resource, scope, freshness, and content. The request is not trusted just because a model made it.</p></article><article><span class="guide-number">03</span><h3>Pause for a person</h3><p>Higher-risk changes can wait for a human yes or no. No answer means no action in this synthetic workflow.</p></article><article><span class="guide-number">04</span><h3>Leave a receipt</h3><p>The record keeps the decision, reason, and references. It does not repeat the secret or the unsafe input.</p></article></div></section>
     <section class="guide-story"><div><p class="eyebrow">A useful mental model</p><h2>The model can knock. It cannot walk through.</h2><p>Imagine a locked service door. An AI helper can bring a request to the door, but the boundary checks the badge and the request before anything moves. If the request is risky, a person can review it. The receipt is the logbook left at the door.</p><a class="text-link" href="/#case">Try the guided case <span aria-hidden="true">↗</span></a></div><div class="guide-diagram" aria-label="A simple diagram showing a model request passing through a policy boundary to a synthetic tool, with a receipt below"><span>model asks</span><i aria-hidden="true"></i><strong>policy boundary</strong><i aria-hidden="true"></i><span>tool only if allowed</span><b aria-hidden="true">receipt</b></div></section>
-    <section class="guide-limits" aria-label="Honest boundaries"><article><p class="eyebrow">Shown here</p><h2>What the demo can show</h2><p>Synthetic capabilities, scoped policy decisions, human approval records, redacted evidence, and tamper-evident receipt shapes.</p></article><article><p class="eyebrow">Still open</p><h2>What it does not claim</h2><p>No universal protection, perfect output, live malware scanning, live steganography detection, or real external tool execution. Production identity, key management, monitoring, and independent review remain separate gates.</p></article></section>
+    <section class="guide-limits" aria-label="Current scope"><article><p class="eyebrow">Current scope</p><h2>A synthetic request-to-receipt workflow</h2><p>The demo covers scoped policy decisions, human approval records, redacted evidence, and receipt verification without connecting to external tools or real user data.</p></article></section>
     <section class="guide-cta"><div><p class="eyebrow">Next</p><h2>See one decision happen.</h2></div><a class="primary-button" href="/">Open the public demo</a></section>
-    <footer><span>CanaryNorth · synthetic learning guide</span><span>No secrets · no external tools</span></footer>
+    <footer><span>CanaryNorth · how it works</span><span>Request · decision · receipt</span></footer>
   </main>
-  <script>
-    const root = document.documentElement;
-    const toggle = document.querySelector('#theme-toggle');
-    const updateTheme = () => { const dark = root.dataset.theme === 'dark'; toggle.setAttribute('aria-pressed', String(dark)); toggle.querySelector('.theme-label').textContent = dark ? 'Light mode' : 'Dark mode'; toggle.querySelector('.theme-icon').textContent = dark ? '☼' : '◐'; };
-    updateTheme();
-    toggle.addEventListener('click', () => { const next = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = next; localStorage.setItem('canarynorth-theme', next); updateTheme(); });
-  </script>
 </body>
 </html>

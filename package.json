@@ -2,12 +2,13 @@
   "name": "context-seal",
   "version": "0.1.0",
   "private": false,
-  "description": "Private AI action receipts for provenance, policy, and tamper-evident tool decisions.",
+  "description": "Policy-gated AI action receipts with scoped capabilities and signed decision records.",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
+    "start:env": "node --env-file=.env server.mjs",
     "test": "node --test",
-    "lint": "node --check server.mjs && node --check src/policy.mjs && node --check src/release-evidence.mjs && node --check scripts/verify-release.mjs && node --check scripts/verify-receipt.mjs && node --check public/app.js && node --check public/graph.mjs",
+    "lint": "node --check server.mjs && node --check src/policy.mjs && node --check src/release-evidence.mjs && node --check scripts/verify-release.mjs && node --check scripts/verify-receipt.mjs && node --check public/app.js && node --check public/graph.mjs && node --check public/theme.js && node --check public/threat-lab.js",
     "release:verify": "node scripts/verify-release.mjs"
   },
   "engines": {

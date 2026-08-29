@@ -39,8 +39,6 @@ function loadConfig() {
     requireAuth,
     signingSecret,
     authToken,
-    // penGatePassword: password for the pen-console gate. Null means closed.
-    penGatePassword: process.env.PENTEL_LAB_PASSWORD || null,
     // ed25519PrivateKey: PEM private key. When set, receipts get real
     // Ed25519 signatures instead of legacy HMAC.
     ed25519PrivateKey: process.env.CONTEXTSEAL_SIGNING_KEY,

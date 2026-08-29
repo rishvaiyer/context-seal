@@ -1,21 +1,17 @@
 # Security policy
 
-CanaryNorth is currently a synthetic demo and is not approved for real credentials, personal data, or production tool execution.
+## Reporting a vulnerability
 
-## Reporting
+Please report suspected vulnerabilities privately to [rishtiyer@gmail.com](mailto:rishtiyer@gmail.com). Include the affected commit, reproduction steps, expected and observed behavior, and likely impact. Do not include real credentials, personal data, or other sensitive material in the report.
 
-Do not open a public issue for a suspected vulnerability. Report privately to the repository owner with reproduction steps, affected commit, impact, and whether any real data was involved.
+## Security model
 
-## Production gate
+CanaryNorth places a server-side policy boundary between an AI-assisted request and a tool action. The current implementation checks capability scope, expiry, identity context, tenant and workspace binding, nonce replay, and approval state before recording a signed decision receipt.
 
-Before real deployment, disable `CONTEXTSEAL_DEMO_MODE`, configure strong sealed signing and authentication keys, connect an identity-bound authentication layer, bind every request to a tenant and workspace, and use durable PostgreSQL or access-controlled JSONL storage. Complete threat modeling, dependency/release review, retention decisions, backup/restore testing, monitoring, incident response planning, and an independent security review.
+Deterministic input signals can hold suspicious content for review, but authorization comes from the structural policy checks rather than those text patterns.
 
-The intended first commercial scope is a small-business AI action gateway with one to three low-risk workflows. It must not be presented as a universal prompt-injection blocker or as proof that generated content is correct.
+## Deployment requirements
 
-## Evidence and detection boundaries
+Production mode fails closed unless authentication, signing material, and durable receipt storage are configured. Use `.env.example` and the deployment-boundary tests as the current configuration reference.
 
-- The human ledger stores safe summaries, categories, hashes, retention metadata, and receipt references. Raw prompts, secrets, and malware payloads do not belong in the normal report.
-- `src/evidence.mjs` provides a versioned envelope-encryption package format using AES-256-GCM, local decryption, redaction checks, retention metadata, and separate integrity signing. It is not a malware scanner, steganography detector, or key-management service.
-- Steganography is a possible signal with false positives, not proof of maliciousness. Malware scanning belongs in an isolated quarantine pipeline with resource limits, scanner versioning, and safe result summaries.
-- The planned ML layer may recommend review based on redacted behavior features. It must not override deny-by-default policy, scope, nonce, or human approval requirements. It must be evaluated in shadow mode against a versioned corpus before enforcement.
-- Customer-controlled wrapping keys, key rotation, deletion, retention enforcement, and recovery procedures are required before real evidence is processed.
+The public Railway deployment is a synthetic demonstration and does not forward requests to external tools.

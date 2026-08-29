@@ -6,13 +6,8 @@
   <meta name="theme-color" content="#f3f1eb">
   <meta name="description" content="A synthetic CanaryNorth walkthrough for seeing how an AI action is checked, decided, and recorded.">
   <title>CanaryNorth | A decision before an AI action</title>
-  <script>
-    (() => {
-      const saved = localStorage.getItem('canarynorth-theme');
-      const theme = saved === 'light' || saved === 'dark' ? saved : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      document.documentElement.dataset.theme = theme;
-    })();
-  </script>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script src="/theme.js"></script>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -32,7 +27,7 @@
         <p class="eyebrow">Synthetic public demo</p>
         <h1 id="page-title">Before a model acts, see the decision.</h1>
         <p class="intro-lede">CanaryNorth checks a proposed AI action before it reaches a tool, then leaves a receipt that a person can read. Try one case below.</p>
-        <div class="intro-notes"><span><i class="signal-dot" aria-hidden="true"></i> synthetic data only</span><span>no external tools called</span><span>no secrets in context</span></div>
+        <div class="intro-notes"><span><i class="signal-dot" aria-hidden="true"></i> synthetic workflow</span><span>scoped decisions</span><span>signed receipts</span></div>
       </div>
       <aside class="boundary-card" aria-label="Trust boundary summary">
         <div class="boundary-card-top"><span class="eyebrow">The boundary</span><span class="case-id">case CN-0042</span></div>
@@ -60,7 +55,7 @@
             <div class="request-body"><div class="request-mark" aria-hidden="true">→</div><div><h3>Fetch today’s forecast for New York</h3><p id="request-copy">The agent presents an opaque capability reference and asks for a synthetic forecast.</p></div></div>
             <div class="request-fields"><div><span>Capability</span><code>cap_weather_read_7f3d</code></div><div><span>Resource</span><code>weather://nyc</code></div><div><span>Input</span><code id="request-input">Synthetic request: forecast for NYC</code></div></div>
             <label class="policy-toggle"><input id="strict-policy" type="checkbox" checked><span class="toggle-track" aria-hidden="true"></span><span><b>Strict checks</b><small>Demo control for expiry and content screening</small></span></label>
-            <div class="case-action-row"><button class="primary-button" id="run-case" type="button" data-demo="safe">Run this case</button><span class="action-note">No real tool will run.</span></div>
+            <div class="case-action-row"><button class="primary-button" id="run-case" type="button" data-demo="safe">Run this case</button><span class="action-note">Uses the local demo workflow.</span></div>
           </article>
         </li>
 
@@ -91,7 +86,7 @@
           <span class="timeline-index" aria-hidden="true">04</span>
           <article class="timeline-card approval-inline" aria-labelledby="approval-title">
             <div class="panel-kicker"><span id="approval-title">Human review</span><span class="badge">synthetic only</span></div>
-            <p class="approval-intro">For a higher-risk change, the boundary pauses and asks a person. This example updates no real ticket.</p>
+            <p class="approval-intro">For a higher-risk change, the boundary pauses and asks a person. This example records a demo ticket decision.</p>
             <div id="approval-status" class="approval-status" role="status" aria-live="polite" aria-atomic="true"><div class="approval-status-main"><span class="approval-status-dot" aria-hidden="true"></span><div><strong>No review requested</strong><p>Request a synthetic ticket update to try the human checkpoint.</p></div></div></div>
             <div class="approval-actions"><button class="secondary-button" id="request-approval" type="button">Request review</button><div class="approval-decision-actions"><button class="approve-btn" id="approve-approval" type="button" hidden>Approve</button><button class="deny-btn" id="deny-approval" type="button" hidden>Deny</button></div></div>
             <p id="approval-error" class="approval-error" role="alert" hidden></p>
@@ -102,7 +97,7 @@
         <li class="timeline-step" id="timeline-step-receipt">
           <span class="timeline-index" aria-hidden="true">05</span>
           <article class="timeline-card receipt-panel">
-            <div class="receipt-panel-head"><span class="panel-kicker">Final proof</span><div class="card-actions"><button class="link-button" id="export-artifact" type="button" disabled>Download bound artifact</button><button class="link-button" id="audit" type="button">Read-only audit</button></div></div>
+            <div class="receipt-panel-head"><span class="panel-kicker">Decision receipt</span><div class="card-actions"><button class="link-button" id="export-artifact" type="button" disabled>Download bound artifact</button><button class="link-button" id="audit" type="button">Read-only audit</button></div></div>
             <h3 id="receipt-title" class="timeline-receipt-title">A readable receipt, not a data dump</h3>
             <p class="section-note">decision + reason + reference</p>
             <div id="receipts" class="receipts"><div class="empty">Run a case to mint the first synthetic receipt.</div></div>
@@ -118,10 +113,10 @@
 
     <details class="details-panel evidence-panel" id="evidence-ledger">
       <summary><span><span class="eyebrow">Evidence ledger</span><strong>Inspect synthetic examples</strong><small>Open only when you want the exact category, status, and hash reference.</small></span><span class="summary-arrow" aria-hidden="true">↘</span></summary>
-      <div class="evidence-wrap"><div class="evidence-warning"><strong>Raw payloads are not shown.</strong> These rows contain synthetic metadata and safe summaries. Malware scanning and steganography detection are not running in this demo.</div><div id="evidence-events" class="evidence-events" role="list" aria-label="Synthetic evidence ledger events"></div></div>
+      <div class="evidence-wrap"><div class="evidence-warning"><strong>Raw payloads are omitted.</strong> These rows keep synthetic metadata, safe summaries, and receipt references.</div><div id="evidence-events" class="evidence-events" role="list" aria-label="Synthetic evidence ledger events"></div></div>
     </details>
 
-    <footer><span>CanaryNorth · synthetic public demo</span><span>No secrets · no external tools · no live scanners</span></footer>
+    <footer><span>CanaryNorth · synthetic reference demo</span><span>Policy decisions · readable receipts</span></footer>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
   <script type="module" src="/app.js"></script>
