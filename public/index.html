@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f3f1eb">
+  <meta name="theme-color" content="#f7f8fa">
   <meta name="description" content="A synthetic CanaryNorth walkthrough for seeing how an AI action is checked, decided, and recorded.">
   <title>CanaryNorth | A decision before an AI action</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -24,9 +24,9 @@
 
     <section class="intro" aria-labelledby="page-title">
       <div class="intro-copy">
-        <p class="eyebrow">Synthetic public demo</p>
-        <h1 id="page-title">Before a model acts, see the decision.</h1>
-        <p class="intro-lede">CanaryNorth checks a proposed AI action before it reaches a tool, then leaves a receipt that a person can read. Try one case below.</p>
+        <p class="eyebrow">Public reference demo</p>
+        <h1 id="page-title">Review an AI action before it reaches a tool.</h1>
+        <p class="intro-lede">CanaryNorth checks a scoped request, pauses for approval when policy requires it, and records a signed decision receipt. The cases below use synthetic data and tools.</p>
         <div class="intro-notes"><span><i class="signal-dot" aria-hidden="true"></i> synthetic workflow</span><span>scoped decisions</span><span>signed receipts</span></div>
       </div>
       <aside class="boundary-card" aria-label="Trust boundary summary">
@@ -38,8 +38,8 @@
 
     <section class="case" id="case" aria-labelledby="case-title">
       <div class="section-heading">
-        <div><p class="eyebrow">Guided case review</p><h2 id="case-title">Watch one request move from proposal to receipt</h2></div>
-        <span class="case-status"><i class="signal-dot" aria-hidden="true"></i> local rehearsal</span>
+        <div><p class="eyebrow">Guided case</p><h2 id="case-title">One request, from proposal to receipt</h2></div>
+        <span class="case-status"><i class="signal-dot" aria-hidden="true"></i> synthetic case</span>
       </div>
 
       <ol class="incident-timeline" aria-label="Incident timeline">
@@ -55,7 +55,7 @@
             <div class="request-body"><div class="request-mark" aria-hidden="true">→</div><div><h3>Fetch today’s forecast for New York</h3><p id="request-copy">The agent presents an opaque capability reference and asks for a synthetic forecast.</p></div></div>
             <div class="request-fields"><div><span>Capability</span><code>cap_weather_read_7f3d</code></div><div><span>Resource</span><code>weather://nyc</code></div><div><span>Input</span><code id="request-input">Synthetic request: forecast for NYC</code></div></div>
             <label class="policy-toggle"><input id="strict-policy" type="checkbox" checked><span class="toggle-track" aria-hidden="true"></span><span><b>Strict checks</b><small>Demo control for expiry and content screening</small></span></label>
-            <div class="case-action-row"><button class="primary-button" id="run-case" type="button" data-demo="safe">Run this case</button><span class="action-note">Uses the local demo workflow.</span></div>
+            <div class="case-action-row"><button class="primary-button" id="run-case" type="button" data-demo="safe">Run this case</button><span class="action-note">Uses synthetic inputs and tools.</span></div>
           </article>
         </li>
 
@@ -75,7 +75,7 @@
         <li class="timeline-step" id="timeline-step-path">
           <span class="timeline-index" aria-hidden="true">03</span>
           <article class="timeline-card">
-            <div class="panel-kicker"><span id="path-title">Decision path</span><span class="mono">visual guide</span></div>
+            <div class="panel-kicker"><span id="path-title">Decision path</span><span class="mono">step controls</span></div>
             <p id="scenario-summary">A scoped synthetic request reaches the boundary and waits for a policy decision.</p>
             <div class="path-controls"><div class="path-tabs" role="group" aria-label="Choose a guided path"><button class="path-tab" data-scenario="safe" aria-pressed="true">Safe</button><button class="path-tab" data-scenario="injection" aria-pressed="false">Injection</button><button class="path-tab" data-scenario="dlp" aria-pressed="false">Sensitive</button></div><div class="path-buttons"><button class="quiet-button" id="step-prev" type="button" disabled>Back</button><button class="quiet-button" id="play-scenario" type="button" aria-pressed="false">Play path</button><button class="quiet-button" id="step-next" type="button">Next</button></div></div>
             <ol id="event-trail" class="event-trail" aria-label="Scenario event trail"></ol>
@@ -98,7 +98,7 @@
           <span class="timeline-index" aria-hidden="true">05</span>
           <article class="timeline-card receipt-panel">
             <div class="receipt-panel-head"><span class="panel-kicker">Decision receipt</span><div class="card-actions"><button class="link-button" id="export-artifact" type="button" disabled>Download bound artifact</button><button class="link-button" id="audit" type="button">Read-only audit</button></div></div>
-            <h3 id="receipt-title" class="timeline-receipt-title">A readable receipt, not a data dump</h3>
+            <h3 id="receipt-title" class="timeline-receipt-title">Decision, reason, and verification reference</h3>
             <p class="section-note">decision + reason + reference</p>
             <div id="receipts" class="receipts"><div class="empty">Run a case to mint the first synthetic receipt.</div></div>
           </article>
@@ -116,7 +116,7 @@
       <div class="evidence-wrap"><div class="evidence-warning"><strong>Raw payloads are omitted.</strong> These rows keep synthetic metadata, safe summaries, and receipt references.</div><div id="evidence-events" class="evidence-events" role="list" aria-label="Synthetic evidence ledger events"></div></div>
     </details>
 
-    <footer><span>CanaryNorth · synthetic reference demo</span><span>Policy decisions · readable receipts</span></footer>
+    <footer><span>CanaryNorth · public reference demo</span><span>Scoped requests · policy decisions · signed receipts</span></footer>
   </main>
   <div id="toast" role="status" aria-live="polite"></div>
   <script type="module" src="/app.js"></script>
